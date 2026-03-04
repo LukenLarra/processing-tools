@@ -1,6 +1,8 @@
 repo,pr_id,title,date_created,url,author,ci_status,draft_status
-content-service,728,Using reusable BDD definition,2026-03-03T12:55:59Z,https://github.com/RedHatInsights/content-service/pull/728,joselsegura,failed,ready
-insights-behavioral-spec,736,Move Behave runner to a common function,2026-03-03T12:50:27Z,https://github.com/RedHatInsights/insights-behavioral-spec/pull/736,joselsegura,ok,ready
+insights-behavioral-spec,737,Modifications for notification-writer tests,2026-03-04T11:40:23Z,https://github.com/RedHatInsights/insights-behavioral-spec/pull/737,joselsegura,ok,ready
+insights-results-smart-proxy,1681, switch the StatusOfRequestID to the new optimized handler ,2026-03-04T09:47:46Z,https://github.com/RedHatInsights/insights-results-smart-proxy/pull/1681,Bee-lee,failed,ready
+parquet-factory,15,chore(deps): update module go.yaml.in/yaml/v2 to v3,2026-03-04T09:26:45Z,https://github.com/RedHatInsights/parquet-factory/pull/15,app/red-hat-konflux,failed,ready
+data-pipeline,31,chore(deps): update python dependencies,2026-03-04T09:21:43Z,https://github.com/RedHatInsights/data-pipeline/pull/31,app/red-hat-konflux,failed,ready
 data-pipeline,30,[CCXDEV-16047] try building the container without requirements.txt,2026-03-03T11:02:44Z,https://github.com/RedHatInsights/data-pipeline/pull/30,juandspy,failed,ready
 data-pipeline,29,Bumped ccx-rules-ocp version,2026-03-03T10:20:12Z,https://github.com/RedHatInsights/data-pipeline/pull/29,InsightsDroid,failed,ready
 insights-results-smart-proxy,1679,Trigger Build,2026-03-03T09:42:20Z,https://github.com/RedHatInsights/insights-results-smart-proxy/pull/1679,ikerreyes,failed,ready

@@ -1,13 +1,13 @@
 # Open Pull Requests (Others)
 
-*Last updated: 2026-03-04 07:16:18*
+*Last updated: 2026-03-04 12:29:45*
 
 **Total PRs: 17**
 
 | Repo | PR | Title | Created | Author | CI Status | Draft |
 |------|-------|-------|---------|--------|-----------|-------|
-| content-service | [728](https://github.com/RedHatInsights/content-service/pull/728) | Using reusable BDD definition | 2026-03-03 | joselsegura | ❌ failed | ready |
-| insights-behavioral-spec | [736](https://github.com/RedHatInsights/insights-behavioral-spec/pull/736) | Move Behave runner to a common function | 2026-03-03 | joselsegura | ✅ ok | ready |
+| insights-behavioral-spec | [737](https://github.com/RedHatInsights/insights-behavioral-spec/pull/737) | Modifications for notification-writer tests | 2026-03-04 | joselsegura | ✅ ok | ready |
+| insights-results-smart-proxy | [1681](https://github.com/RedHatInsights/insights-results-smart-proxy/pull/1681) |  switch the StatusOfRequestID to the new optimized handler  | 2026-03-04 | Bee-lee | ❌ failed | ready |
 | data-pipeline | [30](https://github.com/RedHatInsights/data-pipeline/pull/30) | [CCXDEV-16047] try building the container without requirements.txt | 2026-03-03 | juandspy | ❌ failed | ready |
 | data-pipeline | [29](https://github.com/RedHatInsights/data-pipeline/pull/29) | Bumped ccx-rules-ocp version | 2026-03-03 | InsightsDroid | ❌ failed | ready |
 | insights-results-smart-proxy | [1679](https://github.com/RedHatInsights/insights-results-smart-proxy/pull/1679) | Trigger Build | 2026-03-03 | ikerreyes | ❌ failed | ready |
