@@ -1,11 +1,12 @@
 # Open Merge Requests (Others)
 
-*Last updated: 2026-03-03 03:03:31*
+*Last updated: 2026-03-04 03:03:42*
 
-**Total MRs: 15**
+**Total MRs: 16**
 
 | Project | MR | Title | Created | Author | CI Status | Draft |
 |---------|-------|-------|---------|--------|-----------|-------|
+| ccx/ccx-load-test | [!102](https://gitlab.cee.redhat.com/ccx/ccx-load-test/-/merge_requests/102) | Draft: Add load test for on-demand data gathering endpoints | 2026-03-03 | ireyes | ✅ ok | draft |
 | insights-qe/iqe-ccx-plugin | [!1194](https://gitlab.cee.redhat.com/insights-qe/iqe-ccx-plugin/-/merge_requests/1194) | Update pre-commit hooks | 2026-02-27 | iqe-bot | ❌ failed | no |
 | insights-qe/iqe-ccx-plugin | [!1171](https://gitlab.cee.redhat.com/insights-qe/iqe-ccx-plugin/-/merge_requests/1171) | Fix test environment detection for openshuft_com_app fixture | 2026-01-28 | jsegural | ❌ failed | no |
 | ccx/parquet-factory | [!299](https://gitlab.cee.redhat.com/ccx/parquet-factory/-/merge_requests/299) | TEST PR | 2025-09-30 | jdrobena | ✅ ok | no |
