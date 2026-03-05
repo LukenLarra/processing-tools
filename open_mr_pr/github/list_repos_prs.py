@@ -123,9 +123,10 @@ def main():
     # Sort by creation date (newest first)
     all_prs.sort(key=lambda x: x["createdAt"], reverse=True)
 
-    # Split into Konflux and others
-    konflux_prs = [pr for pr in all_prs if pr["author"]["login"] == "app/red-hat-konflux"]
-    other_prs = [pr for pr in all_prs if pr["author"]["login"] != "app/red-hat-konflux"]
+    # Split into Konflux/Dependabot and others
+    bot_authors = {"app/red-hat-konflux", "app/dependabot"}
+    konflux_prs = [pr for pr in all_prs if pr["author"]["login"] in bot_authors]
+    other_prs = [pr for pr in all_prs if pr["author"]["login"] not in bot_authors]
 
     # Write CSV file (all PRs)
     with open(csv_file, 'w') as f:
