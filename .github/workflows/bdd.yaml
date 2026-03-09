@@ -97,6 +97,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Checkout insights-behavioral-spec
+        uses: actions/checkout@v4
+        with:
+          repository: RedHatInsights/insights-behavioral-spec
+          path: insights-behavioral-spec
+
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
