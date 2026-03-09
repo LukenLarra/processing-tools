@@ -113,6 +113,11 @@ jobs:
         run: |
           make build
 
+      - name: Debug insights structure
+        run: |
+          ls -la $GITHUB_WORKSPACE/insights-behavioral-spec/
+          ls -la $GITHUB_WORKSPACE/insights-behavioral-spec/bdd-configs/
+
       - name: Run BDD Framework
         uses: LukenLarra/RedHat-BDD-Framework@integrate-processing-tools-bdd
         with:
