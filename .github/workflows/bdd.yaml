@@ -100,7 +100,8 @@ jobs:
       - name: Checkout insights-behavioral-spec
         uses: actions/checkout@v4
         with:
-          repository: RedHatInsights/insights-behavioral-spec
+          repository: LukenLarra/insights-behavioral-spec
+          ref: bdd-framework-migration
           path: insights-behavioral-spec
 
       - name: Setup Go
