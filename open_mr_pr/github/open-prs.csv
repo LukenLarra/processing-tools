@@ -1,4 +1,9 @@
 repo,pr_id,title,date_created,url,author,ci_status,draft_status
+insights-operator-gathering-conditions-service,587,chore(deps): update all dependencies,2026-03-08T13:48:45Z,https://github.com/RedHatInsights/insights-operator-gathering-conditions-service/pull/587,app/red-hat-konflux,failed,ready
+parquet-factory,18,chore(deps): update go dependencies,2026-03-08T13:48:16Z,https://github.com/RedHatInsights/parquet-factory/pull/18,app/red-hat-konflux,failed,ready
+insights-operator-gathering-conditions-service,586,fix(deps): update module golang.org/x/sync to v0.20.0,2026-03-08T13:44:15Z,https://github.com/RedHatInsights/insights-operator-gathering-conditions-service/pull/586,app/red-hat-konflux,failed,ready
+insights-results-aggregator,2375,fix(deps): update module golang.org/x/sync to v0.20.0,2026-03-08T13:43:11Z,https://github.com/RedHatInsights/insights-results-aggregator/pull/2375,app/red-hat-konflux,failed,ready
+insights-results-aggregator-exporter,520,chore(deps): update module golang.org/x/sys to v0.42.0,2026-03-08T13:42:51Z,https://github.com/RedHatInsights/insights-results-aggregator-exporter/pull/520,app/red-hat-konflux,ok,ready
 data-pipeline,34,"chore(deps): update dependency boto3 to >=1.42.63,<1.43.0",2026-03-07T05:47:41Z,https://github.com/RedHatInsights/data-pipeline/pull/34,app/red-hat-konflux,failed,ready
 insights-results-aggregator-exporter,519,Bump github.com/minio/minio-go/v7 from 7.0.98 to 7.0.99,2026-03-06T23:13:19Z,https://github.com/RedHatInsights/insights-results-aggregator-exporter/pull/519,app/dependabot,ok,ready
 insights-results-aggregator-exporter,518,fix(deps): update module github.com/minio/minio-go/v7 to v7.0.99,2026-03-06T17:21:30Z,https://github.com/RedHatInsights/insights-results-aggregator-exporter/pull/518,app/red-hat-konflux,ok,ready
