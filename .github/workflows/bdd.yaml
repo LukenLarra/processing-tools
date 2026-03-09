@@ -113,6 +113,12 @@ jobs:
         run: |
           make build
 
+      - name: Debug workspace
+        run: |
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          echo "github.workspace: ${{ github.workspace }}"
+          ls -la $GITHUB_WORKSPACE/bdd-configs/
+
       - name: Run BDD Framework
         uses: LukenLarra/RedHat-BDD-Framework@integrate-processing-tools-bdd
         with:
