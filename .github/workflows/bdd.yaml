@@ -2,66 +2,69 @@ name: BDD tests
 
 on:
   workflow_call:
-      inputs:
-        service:
-          description: Service to be tested
-          required: true
-          type: string
-        
-        use_kafka:
-          description: Whether to use Kafka
-          required: false
-          type: boolean
-          default: false
-        
-        use_postgres:
-          description: Whether to use PostgreSQL
-          required: false
-          type: boolean
-          default: false
-        
-        postgres_version:
-          description: PostgreSQL version
-          required: false
-          type: string
-          default: "13.9"
+    inputs:
+      service:
+        description: Service to be tested
+        required: true
+        type: string
 
-        use_minio:
-          description: Whether to use MinIO
-          required: false
-          type: boolean
-          default: false
+      use_kafka:
+        description: Whether to use Kafka
+        required: false
+        type: boolean
+        default: false
 
-        use_pushgateway:
-          description: Whether to use Prometheus Pushgateway
-          required: false
-          type: boolean
-          default: false
+      use_postgres:
+        description: Whether to use PostgreSQL
+        required: false
+        type: boolean
+        default: false
 
-        use_mock-oauth2-server:
-          description: Whether to use Mock OAuth2 Server
-          required: false
-          type: boolean
-          default: false
+      postgres_version:
+        description: PostgreSQL version
+        required: false
+        type: string
+        default: "13.9"
 
-        go_version:
-          description: Version of Go to be used to build the service
-          required: false
-          type: string
-          default: "1.24"
+      use_minio:
+        description: Whether to use MinIO
+        required: false
+        type: boolean
+        default: false
+
+      use_pushgateway:
+        description: Whether to use Prometheus Pushgateway
+        required: false
+        type: boolean
+        default: false
+
+      use_mock-oauth2-server:
+        description: Whether to use Mock OAuth2 Server
+        required: false
+        type: boolean
+        default: false
+
+      go_version:
+        description: Version of Go to be used to build the service
+        required: false
+        type: string
+        default: "1.24"
+
+      bdd_config:
+        description: Path to the BDD framework config file
+        required: false
+        type: string
+        default: "insights-behavioral-spec/framework.yml"
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
 
 jobs:
   bdd:
     runs-on: ubuntu-latest
     name: BDD tests
-
-    env:
-      BDD_PATH: /insights-behavioral-spec
-      VIRTUAL_ENV: /insights-behavioral-spec-venv/
-      WITHMOCK: 1
-
-    container:
-        image: quay.io/redhat-services-prod/obsint-processing-tenant/insights-behavioral-spec/insights-behavioral-spec:latest
 
     services:
       kafka:
@@ -90,40 +93,17 @@ jobs:
           PORT: 8081
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
           go-version: ${{ inputs.go_version }}
-      - name: Run BDD tests
-        env:
-          SERVICE_UNDER_TEST: ${{ github.workspace }}
-        run: |
-          cd ${BDD_PATH} && make ${{ inputs.service }}
 
-      - name: Check if logs exist
-        if: always()
-        id: check_logs
-        run: |
-          if [ -d "${BDD_PATH}/logs" ] && [ -n "$(ls -A ${BDD_PATH}/logs 2>/dev/null)" ]; then
-            echo "has_logs=true" >> $GITHUB_OUTPUT
-          else
-            echo "has_logs=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Rename logs
-        if: always() && steps.check_logs.outputs.has_logs == 'true'
-        # Otherwise the upload-artifact action will complain
-        run: |
-          for filename in ${BDD_PATH}/logs/*; do
-            mv -n "${filename}" "$(echo "${filename}" | sed -e 's/["><:]//g')"
-          done
-
-      - name: Store tests logs
-        if: always() && steps.check_logs.outputs.has_logs == 'true'
-        uses: actions/upload-artifact@v5
+      - name: Run BDD Framework
+        uses: LukenLarra/RedHat-BDD-Framework@integrate-processing-tools-bdd
         with:
-          name: store-logs-${{ inputs.service }}
-          path: ${{ env.BDD_PATH }}/logs
+          service: ${{ inputs.service }}
+          bdd_config: ${{ inputs.bdd_config }}
