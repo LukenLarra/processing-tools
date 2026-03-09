@@ -108,6 +108,12 @@ jobs:
         with:
           go-version: ${{ inputs.go_version }}
 
+      - name: Build service binary
+        run: |
+          make build
+          cp parquet-factory $GITHUB_WORKSPACE/parquet-factory
+          cp config.toml $GITHUB_WORKSPACE/config.toml
+
       - name: Run BDD Framework
         uses: LukenLarra/RedHat-BDD-Framework@integrate-processing-tools-bdd
         with:
