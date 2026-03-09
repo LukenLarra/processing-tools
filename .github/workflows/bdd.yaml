@@ -54,7 +54,7 @@ on:
         description: Path to the BDD framework config file
         required: false
         type: string
-        default: "insights-behavioral-spec/framework.yml"
+        default: "insights-behavioral-spec/bdd-configs/framework.yml"
 
 permissions:
   contents: read
@@ -112,12 +112,6 @@ jobs:
       - name: Build service binary
         run: |
           make build
-
-      - name: Debug workspace
-        run: |
-          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
-          echo "github.workspace: ${{ github.workspace }}"
-          ls -la $GITHUB_WORKSPACE/bdd-configs/
 
       - name: Run BDD Framework
         uses: LukenLarra/RedHat-BDD-Framework@integrate-processing-tools-bdd
