@@ -112,7 +112,6 @@ jobs:
       - name: Build service binary
         run: |
           make build
-          cp parquet-factory $GITHUB_WORKSPACE/parquet-factory
           cp config.toml $GITHUB_WORKSPACE/config.toml
 
       - name: Run BDD Framework
