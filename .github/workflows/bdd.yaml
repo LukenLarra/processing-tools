@@ -121,3 +121,4 @@ jobs:
         with:
           service: ${{ inputs.service }}
           bdd_config: "${{ github.workspace }}/framework.yml"
+          test_requirements: "insights-behavioral-spec/requirements.txt"
