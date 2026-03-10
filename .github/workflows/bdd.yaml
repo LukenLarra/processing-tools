@@ -81,6 +81,8 @@ jobs:
 
       database:
         image: ${{ inputs.use_postgres == true && format('postgres:{0}', inputs.postgres_version) || '' }}
+        ports:
+          - 5432:5432
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -88,6 +90,8 @@ jobs:
 
       minio:
         image: ${{ inputs.use_minio == true && 'quay.io/ccxdev/minio-server-ubi:latest' || '' }}
+        ports:
+          - 9000:9000
         env:
           MINIO_ACCESS_KEY: test_access_key
           MINIO_SECRET_KEY: test_secret_access_key
@@ -95,9 +99,13 @@ jobs:
 
       pushgateway:
         image: ${{ inputs.use_pushgateway == true && 'quay.io/ccxdev/prom-pushgateway-admin:latest' || '' }}
+        ports:
+          - 9091:9091
 
       mock-oauth2-server:
         image: ${{ inputs.use_mock-oauth2-server == true && 'ghcr.io/navikt/mock-oauth2-server:2.2.1' || '' }}
+        ports:
+          - 8081:8081
         env:
           PORT: 8081
 
