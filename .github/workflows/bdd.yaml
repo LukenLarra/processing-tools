@@ -69,6 +69,11 @@ jobs:
     services:
       kafka:
         image: ${{ inputs.use_kafka == true && 'quay.io/ccxdev/kafka-no-zk:latest' || '' }}
+        options: >-
+          --health-cmd "kafka-topics.sh --bootstrap-server localhost:9092 --list"
+          --health-interval 10s
+          --health-timeout 10s
+          --health-retries 10
 
       database:
         image: ${{ inputs.use_postgres == true && format('postgres:{0}', inputs.postgres_version) || '' }}
