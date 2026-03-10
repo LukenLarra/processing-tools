@@ -145,7 +145,7 @@ jobs:
           echo "127.0.0.1 pushgateway" | sudo tee -a /etc/hosts
 
       - name: Run BDD Framework
-        uses: LukenLarra/RedHat-BDD-Framework@integrate-processing-tools-bdd
+        uses: LukenLarra/RedHat-BDD-Framework@update-framework-config-for-external-use
         with:
           service: ${{ inputs.service }}
           bdd_config: "${{ github.workspace }}/framework.yml"
