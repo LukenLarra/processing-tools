@@ -69,6 +69,10 @@ jobs:
     services:
       kafka:
         image: ${{ inputs.use_kafka == true && 'quay.io/ccxdev/kafka-no-zk:latest' || '' }}
+        ports:
+          - 9092:9092
+        env:
+          KAFKA_ADVERTISED_HOST_NAME: localhost
         options: >-
           --health-cmd "kafka-topics.sh --bootstrap-server localhost:9092 --list"
           --health-interval 10s
@@ -126,19 +130,6 @@ jobs:
 
       - name: Copy framework config
         run: cp insights-behavioral-spec/bdd-configs/${{ inputs.service }}-framework.yml framework.yml
-
-      - name: Wait for Kafka
-        if: ${{ inputs.use_kafka }}
-        run: |
-          echo "Waiting for Kafka to be ready..."
-          for i in $(seq 1 30); do
-            if kcat -b localhost:9092 -L 2>/dev/null | grep -q "broker"; then
-              echo "Kafka is ready"
-              break
-            fi
-            echo "Attempt $i/30, waiting..."
-            sleep 5
-          done
 
       - name: Run BDD Framework
         uses: LukenLarra/RedHat-BDD-Framework@integrate-processing-tools-bdd
