@@ -113,13 +113,11 @@ jobs:
         run: |
           make build
 
-      - name: Debug insights structure
-        run: |
-          ls -la $GITHUB_WORKSPACE/insights-behavioral-spec/
-          ls -la $GITHUB_WORKSPACE/insights-behavioral-spec/bdd-configs/
+      - name: Copy framework config
+        run: cp insights-behavioral-spec/bdd-configs/${{ inputs.service }}-framework.yml framework.yml
 
       - name: Run BDD Framework
         uses: LukenLarra/RedHat-BDD-Framework@integrate-processing-tools-bdd
         with:
           service: ${{ inputs.service }}
-          bdd_config: "${{ github.workspace }}/${{ inputs.bdd_config }}"
+          bdd_config: "${{ github.workspace }}/framework.yml"
