@@ -139,6 +139,11 @@ jobs:
       - name: Copy framework config
         run: cp insights-behavioral-spec/bdd-configs/${{ inputs.service }}-framework.yml framework.yml
 
+      - name: Add hosts entries
+        if: ${{ inputs.use_pushgateway }}
+        run: |
+          echo "127.0.0.1 pushgateway" | sudo tee -a /etc/hosts
+
       - name: Run BDD Framework
         uses: LukenLarra/RedHat-BDD-Framework@integrate-processing-tools-bdd
         with:
