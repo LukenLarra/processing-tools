@@ -2,59 +2,59 @@ name: BDD tests
 
 on:
   workflow_call:
-    inputs:
-      service:
-        description: Service to be tested
-        required: true
-        type: string
+      inputs:
+        service:
+          description: Service to be tested
+          required: true
+          type: string
 
-      use_kafka:
-        description: Whether to use Kafka
-        required: false
-        type: boolean
-        default: false
+        use_kafka:
+          description: Whether to use Kafka
+          required: false
+          type: boolean
+          default: false
 
-      use_postgres:
-        description: Whether to use PostgreSQL
-        required: false
-        type: boolean
-        default: false
+        use_postgres:
+          description: Whether to use PostgreSQL
+          required: false
+          type: boolean
+          default: false
 
-      postgres_version:
-        description: PostgreSQL version
-        required: false
-        type: string
-        default: "13.9"
+        postgres_version:
+          description: PostgreSQL version
+          required: false
+          type: string
+          default: "13.9"
 
-      use_minio:
-        description: Whether to use MinIO
-        required: false
-        type: boolean
-        default: false
+        use_minio:
+          description: Whether to use MinIO
+          required: false
+          type: boolean
+          default: false
 
-      use_pushgateway:
-        description: Whether to use Prometheus Pushgateway
-        required: false
-        type: boolean
-        default: false
+        use_pushgateway:
+          description: Whether to use Prometheus Pushgateway
+          required: false
+          type: boolean
+          default: false
 
-      use_mock-oauth2-server:
-        description: Whether to use Mock OAuth2 Server
-        required: false
-        type: boolean
-        default: false
+        use_mock-oauth2-server:
+          description: Whether to use Mock OAuth2 Server
+          required: false
+          type: boolean
+          default: false
 
-      go_version:
-        description: Version of Go to be used to build the service
-        required: false
-        type: string
-        default: "1.24"
+        go_version:
+          description: Version of Go to be used to build the service
+          required: false
+          type: string
+          default: "1.24"
 
-      bdd_config:
-        description: Path to the BDD framework config file
-        required: false
-        type: string
-        default: "insights-behavioral-spec/bdd-configs/framework.yml"
+        bdd_config:
+          description: Path to the BDD framework config file
+          required: false
+          type: string
+          default: "insights-behavioral-spec/bdd-configs/framework.yml"
 
 permissions:
   contents: read
@@ -145,7 +145,7 @@ jobs:
           echo "127.0.0.1 pushgateway" | sudo tee -a /etc/hosts
 
       - name: Run BDD Framework
-        uses: LukenLarra/RedHat-BDD-Framework@update-framework-config-for-external-use
+        uses: LukenLarra/RedHat-BDD-Framework@main
         with:
           service: ${{ inputs.service }}
           bdd_config: "${{ github.workspace }}/framework.yml"
