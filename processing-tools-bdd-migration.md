@@ -101,7 +101,7 @@ El mismo patrón de `ports` se aplica al resto de services:
   run: echo "127.0.0.1 pushgateway" | sudo tee -a /etc/hosts
 
 - name: Run BDD Framework
-  uses: LukenLarra/RedHat-BDD-Framework@update-framework-config-for-external-use
+  uses: LukenLarra/RedHat-BDD-Framework@main
   with:
     service: ${{ inputs.service }}
     bdd_config: "${{ github.workspace }}/framework.yml"
