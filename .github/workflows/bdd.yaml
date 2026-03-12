@@ -128,7 +128,15 @@ jobs:
 
       - name: Build service binary
         run: |
-          make build
+          if [ -f "build.sh" ]; then
+            echo "Found build.sh, running it"
+            ./build.sh
+          elif [ -f "Makefile" ] && grep -q "^build:" Makefile; then
+            echo "Found Makefile with build target, running make build"
+            make build
+          else
+            echo "No build step found, skipping"
+          fi
 
       - name: Install kcat
         if: ${{ inputs.use_kafka }}
