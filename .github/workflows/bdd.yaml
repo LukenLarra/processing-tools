@@ -162,14 +162,16 @@ jobs:
         run: |
           echo "127.0.0.1 pushgateway" | sudo tee -a /etc/hosts
 
+      - name: Debug PATH
+        run: |
+          echo "PATH: $PATH"
+          which uvicorn || echo "uvicorn not found in PATH"
+          pip show uvicorn || echo "uvicorn not installed"
+          ls /home/runner/work/_actions/LukenLarra/RedHat-BDD-Framework/update-path-variables/.venv/bin/ | grep uvicorn || echo "uvicorn not in venv bin"
+
       - name: Run BDD Framework
         uses: LukenLarra/RedHat-BDD-Framework@update-path-variables
         with:
           service: ${{ inputs.service }}
           bdd_config: "${{ github.workspace }}/framework.yml"
           test_requirements: "insights-behavioral-spec/requirements.txt"
-
-      - name: Debug service logs
-        if: always()
-        run: |
-          cat /home/runner/work/ccx-upgrades-data-eng/ccx-upgrades-data-eng/logs/ccx-upgrades-data-eng/stdout* 2>/dev/null || echo "No logs found"
