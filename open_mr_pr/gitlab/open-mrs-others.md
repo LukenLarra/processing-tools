@@ -1,11 +1,12 @@
 # Open Merge Requests (Others)
 
-*Last updated: 2026-03-12 03:03:28*
+*Last updated: 2026-03-13 03:03:42*
 
-**Total MRs: 12**
+**Total MRs: 13**
 
 | Project | MR | Title | Created | Author | CI Status | Draft |
 |---------|-------|-------|---------|--------|-----------|-------|
+| insights-qe/iqe-ccx-plugin | [!1209](https://gitlab.cee.redhat.com/insights-qe/iqe-ccx-plugin/-/merge_requests/1209) | Add clowder_smoke users | 2026-03-12 | ireyes | ✅ ok | no |
 | insights-qe/iqe-ccx-plugin | [!1194](https://gitlab.cee.redhat.com/insights-qe/iqe-ccx-plugin/-/merge_requests/1194) | Update pre-commit hooks | 2026-02-27 | iqe-bot | ❌ failed | no |
 | insights-qe/iqe-ccx-plugin | [!1171](https://gitlab.cee.redhat.com/insights-qe/iqe-ccx-plugin/-/merge_requests/1171) | Fix test environment detection for openshuft_com_app fixture | 2026-01-28 | jsegural | ❌ failed | no |
 | ccx/ccx-data-pipeline | [!1095](https://gitlab.cee.redhat.com/ccx/ccx-data-pipeline/-/merge_requests/1095) | [DON'T MERGE] [CCXDEV-15282] Determine how much CPU/mem our apps realistically need during a PR check | 2025-08-14 | jdiazsua | ✅ ok | no |
