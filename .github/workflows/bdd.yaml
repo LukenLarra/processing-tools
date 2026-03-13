@@ -172,6 +172,4 @@ jobs:
       - name: Debug service logs
         if: always()
         run: |
-          find /home/runner/work/ccx-upgrades-data-eng -name "*.log" 2>/dev/null
-          find /home/runner/work/ccx-upgrades-data-eng -name "stdout*" 2>/dev/null
-          find /home/runner/work/ccx-upgrades-data-eng -name "stderr*" 2>/dev/null
+          cat "/home/runner/work/ccx-upgrades-data-eng/ccx-upgrades-data-eng/logs/ccx-upgrades-data-eng_Upgrade Risks Prediction Data Engineering - test correct behavior of the LRU cache mechanism_Check that nothing is cached if CACHE_ENABLED is set to 0_stderr.log"
