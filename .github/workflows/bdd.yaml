@@ -163,16 +163,8 @@ jobs:
           echo "127.0.0.1 pushgateway" | sudo tee -a /etc/hosts
 
       - name: Run BDD Framework
-        uses: LukenLarra/RedHat-BDD-Framework@update-path-variables
+        uses: LukenLarra/RedHat-BDD-Framework@main
         with:
           service: ${{ inputs.service }}
           bdd_config: "${{ github.workspace }}/framework.yml"
           test_requirements: "insights-behavioral-spec/requirements.txt"
-      
-      - name: Debug service logs
-        if: always()
-        run: |
-          cat "/home/runner/work/ccx-upgrades-data-eng/ccx-upgrades-data-eng/logs/ccx-upgrades-data-eng_Upgrade Risks Prediction Data Engineering - test correct behavior of the LRU cache mechanism_Check that nothing is cached if CACHE_ENABLED is set to 0_stderr.log"
-          echo "Workspace: ${{ github.workspace }}"
-          find /home/runner/work/ccx-upgrades-data-eng -name "ccx-upgrades-data-eng_logging.yaml" 2>/dev/null
-          find /home/runner/work/ccx-upgrades-data-eng -name "*.yaml" | grep config 2>/dev/null
