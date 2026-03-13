@@ -168,3 +168,10 @@ jobs:
           service: ${{ inputs.service }}
           bdd_config: "${{ github.workspace }}/framework.yml"
           test_requirements: "insights-behavioral-spec/requirements.txt"
+      
+      - name: Debug service logs
+        if: always()
+        run: |
+          find /home/runner/work/ccx-upgrades-data-eng -name "*.log" 2>/dev/null
+          find /home/runner/work/ccx-upgrades-data-eng -name "stdout*" 2>/dev/null
+          find /home/runner/work/ccx-upgrades-data-eng -name "stderr*" 2>/dev/null
