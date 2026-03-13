@@ -172,6 +172,7 @@ jobs:
       - name: Debug service logs
         if: always()
         run: |
+          cat "/home/runner/work/ccx-upgrades-data-eng/ccx-upgrades-data-eng/logs/ccx-upgrades-data-eng_Upgrade Risks Prediction Data Engineering - test correct behavior of the LRU cache mechanism_Check that nothing is cached if CACHE_ENABLED is set to 0_stderr.log"
           echo "Workspace: ${{ github.workspace }}"
           find /home/runner/work/ccx-upgrades-data-eng -name "ccx-upgrades-data-eng_logging.yaml" 2>/dev/null
           find /home/runner/work/ccx-upgrades-data-eng -name "*.yaml" | grep config 2>/dev/null
