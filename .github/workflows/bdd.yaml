@@ -62,12 +62,6 @@ on:
           type: boolean
           default: false
 
-        mocks:
-          description: Comma-separated list of mocks to start from insights-behavioral-spec/mocks/
-          required: false
-          type: string
-          default: ""
-
 permissions:
   contents: read
   checks: write
@@ -153,26 +147,6 @@ jobs:
       - name: Install service package
         if: ${{ inputs.install_service }}
         run: pip install .
-
-      - name: Start mocks
-        if: ${{ inputs.mocks != '' }}
-        run: |
-          declare -A MOCK_CMDS=(
-            ["inference-service"]="uvicorn inference_service:app --port 8001"
-            ["rhobs"]="uvicorn rhobs_service:app --port 8002"
-            ["prometheus"]="uvicorn prometheus_service:app --port 9090"
-            ["s3"]="uvicorn s3_service:app --port 9000"
-            ["content-template-renderer"]="uvicorn content_template_renderer:app --port 8003"
-            ["insights-content-service"]="uvicorn insights_content_service:app --port 8004"
-            ["service-log"]="uvicorn service_log:app --port 8005"
-            ["token-refreshment"]="uvicorn token_refreshment:app --port 8006"
-          )
-          for mock in $(echo "${{ inputs.mocks }}" | tr ',' ' '); do
-            cd ${{ github.workspace }}/insights-behavioral-spec/mocks/${mock}
-            ${MOCK_CMDS[$mock]} &
-            cd -
-          done
-          sleep 3
 
       - name: Install kcat
         if: ${{ inputs.use_kafka }}
