@@ -148,7 +148,6 @@ jobs:
         if: ${{ inputs.install_service }}
         run: |
           pip install .
-          pip install -r requirements.txt
 
       - name: Install kcat
         if: ${{ inputs.use_kafka }}
