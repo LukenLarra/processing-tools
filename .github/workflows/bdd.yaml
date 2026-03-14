@@ -170,3 +170,8 @@ jobs:
           service: ${{ inputs.service }}
           bdd_config: "${{ github.workspace }}/framework.yml"
           test_requirements: "insights-behavioral-spec/requirements.txt"
+
+      - name: Debug service logs
+        if: always()
+        run: |
+          cat "/home/runner/work/ccx-upgrades-data-eng/ccx-upgrades-data-eng/logs/ccx-upgrades-data-eng_Upgrade Risks Prediction Data Engineering - test correct behavior of the LRU cache mechanism_Check that nothing is cached if CACHE_ENABLED is set to 0_stderr.log"
