@@ -1,4 +1,7 @@
 repo,pr_id,title,date_created,url,author,ci_status,draft_status
+insights-results-aggregator-cleaner,622,chore(deps): update all dependencies,2026-03-15T01:43:03Z,https://github.com/RedHatInsights/insights-results-aggregator-cleaner/pull/622,app/red-hat-konflux,failed,ready
+insights-results-aggregator,2385,chore(deps): update all dependencies,2026-03-15T01:42:19Z,https://github.com/RedHatInsights/insights-results-aggregator/pull/2385,app/red-hat-konflux,failed,ready
+content-service,739,Update Go dependencies,2026-03-14T05:39:46Z,https://github.com/RedHatInsights/content-service/pull/739,app/red-hat-konflux,failed,ready
 insights-content-template-renderer,252,Remove pr_check script as now testing is done in konflux,2026-03-13T10:21:09Z,https://github.com/RedHatInsights/insights-content-template-renderer/pull/252,ikerreyes,failed,ready
 data-pipeline,37,"chore(deps): update dependency boto3 to >=1.42.68,<1.43.0",2026-03-12T21:42:40Z,https://github.com/RedHatInsights/data-pipeline/pull/37,app/red-hat-konflux,failed,ready
 ccx-notification-service,1071,Bump github.com/openshift-online/ocm-sdk-go from 0.1.497 to 0.1.498,2026-03-12T07:12:45Z,https://github.com/RedHatInsights/ccx-notification-service/pull/1071,app/dependabot,failed,ready
