@@ -156,9 +156,14 @@ jobs:
         run: cp insights-behavioral-spec/bdd-configs/${{ inputs.service }}-framework.yml framework.yml
 
       - name: Add hosts entries
-        if: ${{ inputs.use_pushgateway }}
+        if: ${{ inputs.use_pushgateway || inputs.use_mock-oauth2-server }}
         run: |
-          echo "127.0.0.1 pushgateway" | sudo tee -a /etc/hosts
+          if ${{ inputs.use_pushgateway }}; then
+            echo "127.0.0.1 pushgateway" | sudo tee -a /etc/hosts
+          fi
+          if ${{ inputs.use_mock-oauth2-server }}; then
+            echo "127.0.0.1 mock-oauth2-server" | sudo tee -a /etc/hosts
+          fi
 
       - name: Run BDD Framework
         uses: LukenLarra/RedHat-BDD-Framework@python-service-install-support
