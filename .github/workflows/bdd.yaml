@@ -50,17 +50,17 @@ on:
           type: string
           default: "1.24"
 
+        install_service:
+          description: Whether to install the service as a Python package via pip install
+          required: false
+          type: boolean
+          default: false
+
         bdd_config:
           description: Path to the BDD framework config file
           required: false
           type: string
           default: "insights-behavioral-spec/bdd-configs/framework.yml"
-
-        install_service:
-          description: Whether to pip install the service package
-          required: false
-          type: boolean
-          default: false
 
 permissions:
   contents: read
@@ -124,15 +124,17 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: LukenLarra/insights-behavioral-spec
-          ref: bdd-framework-python-migration
+          ref: bdd-framework-migration
           path: insights-behavioral-spec
 
       - name: Setup Go
+        if: ${{ !inputs.install_service }}
         uses: actions/setup-go@v4
         with:
           go-version: ${{ inputs.go_version }}
 
       - name: Build service binary
+        if: ${{ !inputs.install_service }}
         run: |
           if [ -f "build.sh" ]; then
             echo "Found build.sh, running it"
@@ -143,11 +145,6 @@ jobs:
           else
             echo "No build step found, skipping"
           fi
-
-      - name: Install service package
-        if: ${{ inputs.install_service }}
-        run: |
-          pip install .
 
       - name: Install kcat
         if: ${{ inputs.use_kafka }}
@@ -164,13 +161,26 @@ jobs:
           echo "127.0.0.1 pushgateway" | sudo tee -a /etc/hosts
 
       - name: Run BDD Framework
-        uses: LukenLarra/RedHat-BDD-Framework@poc-framework-migration
+        uses: LukenLarra/RedHat-BDD-Framework@python-service-install-support
         with:
           service: ${{ inputs.service }}
           bdd_config: "${{ github.workspace }}/framework.yml"
           test_requirements: "insights-behavioral-spec/requirements.txt"
+          service_package: ${{ inputs.install_service && github.workspace || '' }}
 
       - name: Debug service logs
         if: always()
         run: |
-          cat "/home/runner/work/ccx-upgrades-data-eng/ccx-upgrades-data-eng/logs/ccx-upgrades-data-eng_Upgrade Risks Prediction Data Engineering - test correct behavior of the LRU cache mechanism_Check that nothing is cached if CACHE_ENABLED is set to 0_stderr.log"
+          LOG_DIR="${{ github.workspace }}/logs"
+          if [ -d "$LOG_DIR" ]; then
+            echo "=== Service logs found in $LOG_DIR ==="
+            for log_file in "$LOG_DIR"/*.log; do
+              if [ -f "$log_file" ]; then
+                echo ""
+                echo "--- $log_file ---"
+                cat "$log_file"
+              fi
+            done
+          else
+            echo "No logs directory found at $LOG_DIR"
+          fi
