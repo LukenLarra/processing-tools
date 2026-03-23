@@ -1,15 +1,19 @@
 # Open Pull Requests (Konflux)
 
-*Last updated: 2026-03-22 04:40:18*
+*Last updated: 2026-03-23 04:47:11*
 
-**Total Konflux PRs: 15**
+**Total Konflux PRs: 19**
 
 | Repo | PR | Title | Created | Author | CI Status | Draft |
 |------|-------|-------|---------|--------|-----------|-------|
+| ccx-notification-service | [1077](https://github.com/RedHatInsights/ccx-notification-service/pull/1077) | chore(deps): update pre-commit hook golangci/golangci-lint to v2.11.4 | 2026-03-22 | app/red-hat-konflux | ❌ failed | ready |
+| insights-results-aggregator | [2391](https://github.com/RedHatInsights/insights-results-aggregator/pull/2391) | chore(deps): update pre-commit hook golangci/golangci-lint to v2.11.4 | 2026-03-22 | app/red-hat-konflux | ❌ failed | ready |
+| ccx-notification-writer | [775](https://github.com/RedHatInsights/ccx-notification-writer/pull/775) | chore(deps): update pre-commit hook golangci/golangci-lint to v2.11.4 | 2026-03-22 | app/red-hat-konflux | ❌ failed | ready |
+| content-service | [746](https://github.com/RedHatInsights/content-service/pull/746) | Update pre-commit hook golangci/golangci-lint to v2.11.4 | 2026-03-22 | app/red-hat-konflux | ❌ failed | ready |
 | content-service | [745](https://github.com/RedHatInsights/content-service/pull/745) | Update module go.yaml.in/yaml/v2 to v3 | 2026-03-20 | app/red-hat-konflux | ❌ failed | ready |
 | parquet-factory | [25](https://github.com/RedHatInsights/parquet-factory/pull/25) | chore(deps): update go dependencies | 2026-03-20 | app/red-hat-konflux | ✅ ok | ready |
 | insights-results-aggregator | [2390](https://github.com/RedHatInsights/insights-results-aggregator/pull/2390) | chore(deps): update all dependencies | 2026-03-20 | app/red-hat-konflux | ❌ failed | ready |
-| parquet-factory | [24](https://github.com/RedHatInsights/parquet-factory/pull/24) | chore(deps): update pre-commit hook astral-sh/ruff-pre-commit to v0.15.7 | 2026-03-20 | app/red-hat-konflux | ✅ ok | ready |
+| parquet-factory | [24](https://github.com/RedHatInsights/parquet-factory/pull/24) | chore(deps): update pre-commit hooks | 2026-03-20 | app/red-hat-konflux | ✅ ok | ready |
 | insights-results-smart-proxy | [1686](https://github.com/RedHatInsights/insights-results-smart-proxy/pull/1686) | Bump github.com/buger/jsonparser from 1.1.1 to 1.1.2 | 2026-03-19 | app/dependabot | ❌ failed | ready |
 | insights-results-aggregator-exporter | [525](https://github.com/RedHatInsights/insights-results-aggregator-exporter/pull/525) | chore(deps): update pre-commit hook astral-sh/ruff-pre-commit to v0.15.7 | 2026-03-19 | app/red-hat-konflux | ✅ ok | ready |
 | ccx-notification-writer | [774](https://github.com/RedHatInsights/ccx-notification-writer/pull/774) | Bump github.com/lib/pq from 1.11.2 to 1.12.0 | 2026-03-19 | app/dependabot | ❌ failed | ready |
