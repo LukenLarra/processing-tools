@@ -116,12 +116,12 @@ jobs:
           PORT: 8081
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Checkout insights-behavioral-spec
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           repository: LukenLarra/insights-behavioral-spec
           ref: bdd-framework-python-migration
