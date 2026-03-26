@@ -152,9 +152,6 @@ jobs:
           sudo apt-get update -q
           sudo apt-get install -y kafkacat
 
-      - name: Copy framework config
-        run: cp insights-behavioral-spec/bdd-configs/${{ inputs.service }}-framework.yml framework.yml
-
       - name: Add hosts entries
         if: ${{ inputs.use_pushgateway || inputs.use_mock-oauth2-server }}
         run: |
@@ -169,6 +166,6 @@ jobs:
         uses: LukenLarra/RedHat-BDD-Framework@python-service-install-support
         with:
           service: ${{ inputs.service }}
-          bdd_config: "${{ github.workspace }}/framework.yml"
+          bdd_config: "${{ github.workspace }}/insights-behavioral-spec/bdd-configs/${{ inputs.service }}-framework.yml"
           test_requirements: "insights-behavioral-spec/requirements.txt"
           service_package: ${{ inputs.install_service && github.workspace || '' }}
