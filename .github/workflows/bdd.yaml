@@ -166,9 +166,10 @@ jobs:
           fi
 
       - name: Run BDD Framework
-        uses: LukenLarra/RedHat-BDD-Framework@python-service-install-support
+        uses: LukenLarra/RedHat-BDD-Framework@57-allow-configurable-python-version-in-the-framework
         with:
           service: ${{ inputs.service }}
           bdd_config: "${{ github.workspace }}/framework.yml"
           test_requirements: "insights-behavioral-spec/requirements.txt"
           service_package: ${{ inputs.install_service && github.workspace || '' }}
+          python_version: "3.12"
