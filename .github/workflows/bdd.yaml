@@ -50,6 +50,12 @@ on:
           type: string
           default: "1.24"
 
+        install_service:
+          description: Whether to install the service as a Python package via pip install
+          required: false
+          type: boolean
+          default: false
+
         bdd_config:
           description: Path to the BDD framework config file
           required: false
@@ -122,11 +128,13 @@ jobs:
           path: insights-behavioral-spec
 
       - name: Setup Go
+        if: ${{ !inputs.install_service }}
         uses: actions/setup-go@v4
         with:
           go-version: ${{ inputs.go_version }}
 
       - name: Build service binary
+        if: ${{ !inputs.install_service }}
         run: |
           if [ -f "build.sh" ]; then
             echo "Found build.sh, running it"
@@ -148,13 +156,19 @@ jobs:
         run: cp insights-behavioral-spec/bdd-configs/${{ inputs.service }}-framework.yml framework.yml
 
       - name: Add hosts entries
-        if: ${{ inputs.use_pushgateway }}
+        if: ${{ inputs.use_pushgateway || inputs.use_mock-oauth2-server }}
         run: |
-          echo "127.0.0.1 pushgateway" | sudo tee -a /etc/hosts
+          if ${{ inputs.use_pushgateway }}; then
+            echo "127.0.0.1 pushgateway" | sudo tee -a /etc/hosts
+          fi
+          if ${{ inputs.use_mock-oauth2-server }}; then
+            echo "127.0.0.1 mock-oauth2-server" | sudo tee -a /etc/hosts
+          fi
 
       - name: Run BDD Framework
-        uses: LukenLarra/RedHat-BDD-Framework@main
+        uses: LukenLarra/RedHat-BDD-Framework@python-service-install-support
         with:
           service: ${{ inputs.service }}
           bdd_config: "${{ github.workspace }}/framework.yml"
           test_requirements: "insights-behavioral-spec/requirements.txt"
+          service_package: ${{ inputs.install_service && github.workspace || '' }}
