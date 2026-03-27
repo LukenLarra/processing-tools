@@ -7,19 +7,19 @@ on:
           description: Service to be tested
           required: true
           type: string
-        
+
         use_kafka:
           description: Whether to use Kafka
           required: false
           type: boolean
           default: false
-        
+
         use_postgres:
           description: Whether to use PostgreSQL
           required: false
           type: boolean
           default: false
-        
+
         postgres_version:
           description: PostgreSQL version
           required: false
@@ -50,25 +50,45 @@ on:
           type: string
           default: "1.24"
 
+        install_service:
+          description: Whether to install the service as a Python package via pip install
+          required: false
+          type: boolean
+          default: false
+
+        bdd_config:
+          description: Path to the BDD framework config file
+          required: false
+          type: string
+          default: "insights-behavioral-spec/bdd-configs/framework.yml"
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
 jobs:
   bdd:
     runs-on: ubuntu-latest
     name: BDD tests
 
-    env:
-      BDD_PATH: /insights-behavioral-spec
-      VIRTUAL_ENV: /insights-behavioral-spec-venv/
-      WITHMOCK: 1
-
-    container:
-        image: quay.io/redhat-services-prod/obsint-processing-tenant/insights-behavioral-spec/insights-behavioral-spec:latest
-
     services:
       kafka:
         image: ${{ inputs.use_kafka == true && 'quay.io/ccxdev/kafka-no-zk:latest' || '' }}
+        ports:
+          - 9092:9092
+        env:
+          KAFKA_ADVERTISED_HOST_NAME: localhost
+        options: >-
+          --health-cmd "kafka-topics.sh --bootstrap-server localhost:9092 --list"
+          --health-interval 10s
+          --health-timeout 10s
+          --health-retries 10
 
       database:
         image: ${{ inputs.use_postgres == true && format('postgres:{0}', inputs.postgres_version) || '' }}
+        ports:
+          - 5432:5432
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -76,6 +96,8 @@ jobs:
 
       minio:
         image: ${{ inputs.use_minio == true && 'quay.io/ccxdev/minio-server-ubi:latest' || '' }}
+        ports:
+          - 9000:9000
         env:
           MINIO_ACCESS_KEY: test_access_key
           MINIO_SECRET_KEY: test_secret_access_key
@@ -83,47 +105,70 @@ jobs:
 
       pushgateway:
         image: ${{ inputs.use_pushgateway == true && 'quay.io/ccxdev/prom-pushgateway-admin:latest' || '' }}
+        ports:
+          - 9091:9091
 
       mock-oauth2-server:
         image: ${{ inputs.use_mock-oauth2-server == true && 'ghcr.io/navikt/mock-oauth2-server:2.2.1' || '' }}
+        ports:
+          - 8081:8081
         env:
           PORT: 8081
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Checkout insights-behavioral-spec
+        uses: actions/checkout@v4
+        with:
+          repository: LukenLarra/insights-behavioral-spec
+          ref: bdd-framework-python-migration
+          path: insights-behavioral-spec
+
       - name: Setup Go
+        if: ${{ !inputs.install_service }}
         uses: actions/setup-go@v4
         with:
           go-version: ${{ inputs.go_version }}
-      - name: Run BDD tests
-        env:
-          SERVICE_UNDER_TEST: ${{ github.workspace }}
-        run: |
-          cd ${BDD_PATH} && make ${{ inputs.service }}
 
-      - name: Check if logs exist
-        if: always()
-        id: check_logs
+      - name: Build service binary
+        if: ${{ !inputs.install_service }}
         run: |
-          if [ -d "${BDD_PATH}/logs" ] && [ -n "$(ls -A ${BDD_PATH}/logs 2>/dev/null)" ]; then
-            echo "has_logs=true" >> $GITHUB_OUTPUT
+          if [ -f "build.sh" ]; then
+            echo "Found build.sh, running it"
+            ./build.sh
+          elif [ -f "Makefile" ] && grep -q "^build:" Makefile; then
+            echo "Found Makefile with build target, running make build"
+            make build
           else
-            echo "has_logs=false" >> $GITHUB_OUTPUT
+            echo "No build step found, skipping"
           fi
 
-      - name: Rename logs
-        if: always() && steps.check_logs.outputs.has_logs == 'true'
-        # Otherwise the upload-artifact action will complain
+      - name: Install kcat
+        if: ${{ inputs.use_kafka }}
         run: |
-          for filename in ${BDD_PATH}/logs/*; do
-            mv -n "${filename}" "$(echo "${filename}" | sed -e 's/["><:]//g')"
-          done
+          sudo apt-get update -q
+          sudo apt-get install -y kafkacat
 
-      - name: Store tests logs
-        if: always() && steps.check_logs.outputs.has_logs == 'true'
-        uses: actions/upload-artifact@v5
+      - name: Copy framework config
+        run: cp insights-behavioral-spec/bdd-configs/${{ inputs.service }}-framework.yml framework.yml
+
+      - name: Add hosts entries
+        if: ${{ inputs.use_pushgateway || inputs.use_mock-oauth2-server }}
+        run: |
+          if ${{ inputs.use_pushgateway }}; then
+            echo "127.0.0.1 pushgateway" | sudo tee -a /etc/hosts
+          fi
+          if ${{ inputs.use_mock-oauth2-server }}; then
+            echo "127.0.0.1 mock-oauth2-server" | sudo tee -a /etc/hosts
+          fi
+
+      - name: Run BDD Framework
+        uses: LukenLarra/RedHat-BDD-Framework@python-service-install-support
         with:
-          name: store-logs-${{ inputs.service }}
-          path: ${{ env.BDD_PATH }}/logs
+          service: ${{ inputs.service }}
+          bdd_config: "${{ github.workspace }}/framework.yml"
+          test_requirements: "insights-behavioral-spec/requirements.txt"
+          service_package: ${{ inputs.install_service && github.workspace || '' }}
