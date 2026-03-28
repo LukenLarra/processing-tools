@@ -173,3 +173,20 @@ jobs:
           test_requirements: "insights-behavioral-spec/requirements.txt"
           service_package: ${{ inputs.install_service && github.workspace || '' }}
           python_version: "3.12"
+
+      - name: Debug service logs
+        if: always()
+        run: |
+          LOG_DIR="${{ github.workspace }}/logs"
+          if [ -d "$LOG_DIR" ]; then
+            echo "=== Service logs found in $LOG_DIR ==="
+            for log_file in "$LOG_DIR"/**/*.log; do
+              if [ -f "$log_file" ]; then
+                echo ""
+                echo "--- $log_file ---"
+                cat "$log_file"
+              fi
+            done
+          else
+            echo "No logs directory found at $LOG_DIR"
+          fi
