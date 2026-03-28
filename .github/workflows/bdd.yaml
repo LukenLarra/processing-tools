@@ -166,13 +166,12 @@ jobs:
           fi
 
       - name: Run BDD Framework
-        uses: LukenLarra/RedHat-BDD-Framework@57-allow-configurable-python-version-in-the-framework
+        uses: LukenLarra/RedHat-BDD-Framework@modify-pythonpath-usage
         with:
           service: ${{ inputs.service }}
           bdd_config: "${{ github.workspace }}/framework.yml"
           test_requirements: "insights-behavioral-spec/requirements.txt"
           service_package: ${{ inputs.install_service && github.workspace || '' }}
-          python_version: "3.12"
 
       - name: Debug service logs
         if: always()
