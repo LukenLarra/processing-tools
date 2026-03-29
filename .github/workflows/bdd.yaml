@@ -124,7 +124,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: LukenLarra/insights-behavioral-spec
-          ref: bdd-framework-migration
+          ref: modify-pythonpath-usage
           path: insights-behavioral-spec
 
       - name: Setup Go
@@ -166,7 +166,7 @@ jobs:
           fi
 
       - name: Run BDD Framework
-        uses: LukenLarra/RedHat-BDD-Framework@python-service-install-support
+        uses: LukenLarra/RedHat-BDD-Framework@modify-pythonpath-usage
         with:
           service: ${{ inputs.service }}
           bdd_config: "${{ github.workspace }}/framework.yml"

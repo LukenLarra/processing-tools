@@ -86,7 +86,7 @@ El mismo patrón de `ports` se aplica al resto de services:
   uses: actions/checkout@v4
   with:
     repository: LukenLarra/insights-behavioral-spec
-    ref: bdd-framework-migration
+    ref: main
     path: insights-behavioral-spec
 
 - name: Install kcat
