@@ -68,9 +68,42 @@ permissions:
   pull-requests: write
 
 jobs:
-  bdd:
+  # 1. JOB: Descubre las features y crea la matriz JSON
+  discover_features:
     runs-on: ubuntu-latest
-    name: BDD tests
+    outputs:
+      matrix: ${{ steps.discovery.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout insights-behavioral-spec
+        uses: actions/checkout@v4
+        with:
+          repository: LukenLarra/insights-behavioral-spec
+          ref: main
+          path: insights-behavioral-spec
+
+      - name: Copy framework config
+        run: cp insights-behavioral-spec/bdd-configs/${{ inputs.service }}-framework.yml framework.yml
+
+      - name: Run discovery
+        id: discovery
+        uses: LukenLarra/RedHat-BDD-Framework/discovery@feature-level-parallel-execution
+        with:
+          bdd_config: "${{ github.workspace }}/framework.yml"
+
+  # 2. JOB: Usa strategy matrix con el output del anterior
+  bdd:
+    needs: discover_features
+    runs-on: ubuntu-latest
+    name: BDD tests - ${{ matrix.feature_file }}
+    
+    strategy:
+      fail-fast: false # Si falla un test, los demás continuan
+      matrix:
+        feature_file: ${{ fromJSON(needs.discover_features.outputs.matrix) }}
 
     services:
       kafka:
@@ -124,7 +157,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: LukenLarra/insights-behavioral-spec
-          ref: modify-pythonpath-usage
+          ref: main
           path: insights-behavioral-spec
 
       - name: Setup Go
@@ -166,9 +199,12 @@ jobs:
           fi
 
       - name: Run BDD Framework
-        uses: LukenLarra/RedHat-BDD-Framework@modify-pythonpath-usage
+        uses: LukenLarra/RedHat-BDD-Framework@feature-level-parallel-execution
         with:
           service: ${{ inputs.service }}
           bdd_config: "${{ github.workspace }}/framework.yml"
           test_requirements: "insights-behavioral-spec/requirements.txt"
           service_package: ${{ inputs.install_service && github.workspace || '' }}
+          feature_file: ${{ matrix.feature_file }}
+          publish_results: "false" # Importante para no spammear la PR con comentarios individuales
+          artifact_name_suffix: "-job-${{ strategy.job-index }}" # Evita que los jobs sobrescriban sus reportes
