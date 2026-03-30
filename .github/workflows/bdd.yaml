@@ -62,6 +62,12 @@ on:
           type: string
           default: "insights-behavioral-spec/bdd-configs/framework.yml"
 
+        max_parallel:
+          description: "Cantidad máxima de ejecuciones simultáneas (1 para secuencial)."
+          required: false
+          type: number
+          default: 256
+
 permissions:
   contents: read
   checks: write
@@ -103,7 +109,8 @@ jobs:
     strategy:
       fail-fast: false # Si falla un test, los demás continuan
       matrix:
-        feature_file: ${{ fromJSON(needs.discover_features.outputs.matrix) }}
+        feature_file: ${{ fromJSON(needs.discover_features.outputs.matrix) }}  
+      max-parallel: ${{ inputs.max_parallel }}
 
     services:
       kafka:
