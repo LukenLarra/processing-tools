@@ -238,11 +238,11 @@ jobs:
       - name: Download partial reports
         uses: actions/download-artifact@v4
         with:
-          pattern: bdd-test-reports-movies-api-*
+          pattern: bdd-test-reports-${{ inputs.service }}-*
           path: reports/junit
           merge-multiple: true
 
       - name: Publish merged test results
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
-          files: reports/junit/*.xml  
+          files: reports/junit/*.xml
