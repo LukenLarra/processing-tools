@@ -108,9 +108,9 @@ jobs:
     
     strategy:
       fail-fast: false # Si falla un test, los demás continuan
+      max-parallel: ${{ fromJSON(inputs.max_parallel || '256') }}
       matrix:
         feature_file: ${{ fromJSON(needs.discover_features.outputs.matrix) }}  
-      max-parallel: ${{ inputs.max_parallel }}
 
     services:
       kafka:
