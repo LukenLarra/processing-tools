@@ -223,3 +223,26 @@ jobs:
           feature_file: ${{ matrix.feature_file }}
           publish_results: ${{ inputs.parallel_execution == true && 'false' || 'true' }}
           artifact_name_suffix: ${{ inputs.parallel_execution == true && format('-job-{0}', strategy.job-index) || '' }}
+
+  # === 3. PUBLISH AGGREGATED REPORT ===
+  publish_report:
+    name: Publish Test Results
+    needs: bdd
+    runs-on: ubuntu-latest
+    if: always()
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+    steps:
+      - name: Download partial reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: bdd-test-reports-movies-api-*
+          path: reports/junit
+          merge-multiple: true
+
+      - name: Publish merged test results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: reports/junit/*.xml  
