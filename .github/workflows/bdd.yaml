@@ -2,71 +2,77 @@ name: BDD tests
 
 on:
   workflow_call:
-      inputs:
-        service:
-          description: Service to be tested
-          required: true
-          type: string
+    inputs:
+      service:
+        description: Service to be tested
+        required: true
+        type: string
 
-        use_kafka:
-          description: Whether to use Kafka
-          required: false
-          type: boolean
-          default: false
+      use_kafka:
+        description: Whether to use Kafka
+        required: false
+        type: boolean
+        default: false
 
-        use_postgres:
-          description: Whether to use PostgreSQL
-          required: false
-          type: boolean
-          default: false
+      use_postgres:
+        description: Whether to use PostgreSQL
+        required: false
+        type: boolean
+        default: false
 
-        postgres_version:
-          description: PostgreSQL version
-          required: false
-          type: string
-          default: "13.9"
+      postgres_version:
+        description: PostgreSQL version
+        required: false
+        type: string
+        default: "13.9"
 
-        use_minio:
-          description: Whether to use MinIO
-          required: false
-          type: boolean
-          default: false
+      use_minio:
+        description: Whether to use MinIO
+        required: false
+        type: boolean
+        default: false
 
-        use_pushgateway:
-          description: Whether to use Prometheus Pushgateway
-          required: false
-          type: boolean
-          default: false
+      use_pushgateway:
+        description: Whether to use Prometheus Pushgateway
+        required: false
+        type: boolean
+        default: false
 
-        use_mock-oauth2-server:
-          description: Whether to use Mock OAuth2 Server
-          required: false
-          type: boolean
-          default: false
+      use_mock-oauth2-server:
+        description: Whether to use Mock OAuth2 Server
+        required: false
+        type: boolean
+        default: false
 
-        go_version:
-          description: Version of Go to be used to build the service
-          required: false
-          type: string
-          default: "1.24"
+      go_version:
+        description: Version of Go to be used to build the service
+        required: false
+        type: string
+        default: "1.24"
 
-        install_service:
-          description: Whether to install the service as a Python package via pip install
-          required: false
-          type: boolean
-          default: false
+      install_service:
+        description: Whether to install the service as a Python package via pip install
+        required: false
+        type: boolean
+        default: false
 
-        bdd_config:
-          description: Path to the BDD framework config file
-          required: false
-          type: string
-          default: "insights-behavioral-spec/bdd-configs/framework.yml"
+      bdd_config:
+        description: Path to the BDD framework config file
+        required: false
+        type: string
+        default: "insights-behavioral-spec/bdd-configs/framework.yml"
 
-        max_parallel:
-          description: "Cantidad máxima de ejecuciones simultáneas (1 para secuencial)."
-          required: false
-          type: number
-          default: 256
+      parallel_execution:
+        description: "Ejecutar de forma paralela usando steps independientes por .feature"
+        required: false
+        type: boolean
+        default: false
+
+      max_parallel:
+        description: "Cantidad máxima de ejecuciones simultáneas (1 para secuencial)."
+        required: false
+        type: number
+        default: 256
 
 permissions:
   contents: read
@@ -76,6 +82,7 @@ permissions:
 jobs:
   # 1. JOB: Descubre las features y crea la matriz JSON
   discover_features:
+    if: ${{ inputs.parallel_execution }}
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.discovery.outputs.matrix }}
@@ -102,15 +109,16 @@ jobs:
 
   # 2. JOB: Usa strategy matrix con el output del anterior
   bdd:
+    if: ${{ always() && !cancelled() && !contains(needs.*.result, 'failure') }}
     needs: discover_features
     runs-on: ubuntu-latest
-    name: BDD tests - ${{ matrix.feature_file }}
-    
+    name: BDD tests ${{ matrix.feature_file != '' && format('- {0}', matrix.feature_file) || '' }}
+
     strategy:
       fail-fast: false # Si falla un test, los demás continuan
-      max-parallel: ${{ fromJSON(inputs.max_parallel || '256') }}
+      max-parallel: ${{ inputs.parallel_execution == true && fromJSON(inputs.max_parallel || '256') || 1 }}
       matrix:
-        feature_file: ${{ fromJSON(needs.discover_features.outputs.matrix) }}  
+        feature_file: ${{ inputs.parallel_execution == true && fromJSON(needs.discover_features.outputs.matrix) || fromJSON('[""]') }}
 
     services:
       kafka:
@@ -211,7 +219,7 @@ jobs:
           service: ${{ inputs.service }}
           bdd_config: "${{ github.workspace }}/framework.yml"
           test_requirements: "insights-behavioral-spec/requirements.txt"
-          service_package: ${{ inputs.install_service && github.workspace || '' }}
+          service_package: ${{ inputs.install_service == true && github.workspace || '' }}
           feature_file: ${{ matrix.feature_file }}
-          publish_results: "false" # Importante para no spammear la PR con comentarios individuales
-          artifact_name_suffix: "-job-${{ strategy.job-index }}" # Evita que los jobs sobrescriban sus reportes
+          publish_results: ${{ inputs.parallel_execution == true && 'false' || 'true' }}
+          artifact_name_suffix: ${{ inputs.parallel_execution == true && format('-job-{0}', strategy.job-index) || '' }}
