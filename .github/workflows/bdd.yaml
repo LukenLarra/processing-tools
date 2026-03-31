@@ -80,7 +80,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  # 1. JOB: Descubre las features y crea la matriz JSON
+  # Descubre las features y crea la matriz JSON
   discover_features:
     if: ${{ inputs.parallel_execution }}
     runs-on: ubuntu-latest
@@ -140,7 +140,6 @@ jobs:
           name: workspace-build-${{ github.run_id }}
           path: |
             .
-            !.git/
           include-hidden-files: true
 
   # Usar strategy matrix con el output del anterior
