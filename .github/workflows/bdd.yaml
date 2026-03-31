@@ -107,10 +107,46 @@ jobs:
         with:
           bdd_config: "${{ github.workspace }}/framework.yml"
 
-  # 2. JOB: Usa strategy matrix con el output del anterior
+  # Compila el binario de Go y empaqueta el directorio resultante
+  build_binary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        if: ${{ !inputs.install_service }}
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ inputs.go_version }}
+
+      - name: Build service binary
+        if: ${{ !inputs.install_service }}
+        run: |
+          if [ -f "build.sh" ]; then
+            echo "Found build.sh, running it"
+            ./build.sh
+          elif [ -f "Makefile" ] && grep -q "^build:" Makefile; then
+            echo "Found Makefile with build target, running make build"
+            make build
+          else
+            echo "No build step found, skipping"
+          fi
+
+      - name: Archive workspace build
+        uses: actions/upload-artifact@v4
+        with:
+          name: workspace-build-${{ github.run_id }}
+          path: |
+            .
+            !.git/
+          include-hidden-files: true
+
+  # Usar strategy matrix con el output del anterior
   bdd:
     if: ${{ always() && !cancelled() && !contains(needs.*.result, 'failure') }}
-    needs: discover_features
+    needs: [discover_features, build_binary]
     runs-on: ubuntu-latest
     name: BDD tests ${{ matrix.feature_file != '' && format('- {0}', matrix.feature_file) || '' }}
 
@@ -164,9 +200,14 @@ jobs:
           PORT: 8081
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Download workspace build
+        uses: actions/download-artifact@v4
         with:
-          fetch-depth: 0
+          name: workspace-build-${{ github.run_id }}
+          path: .
+
+      - name: Restore permissions
+        run: chmod -R +x * || true
 
       - name: Checkout insights-behavioral-spec
         uses: actions/checkout@v4
@@ -174,25 +215,6 @@ jobs:
           repository: LukenLarra/insights-behavioral-spec
           ref: main
           path: insights-behavioral-spec
-
-      - name: Setup Go
-        if: ${{ !inputs.install_service }}
-        uses: actions/setup-go@v4
-        with:
-          go-version: ${{ inputs.go_version }}
-
-      - name: Build service binary
-        if: ${{ !inputs.install_service }}
-        run: |
-          if [ -f "build.sh" ]; then
-            echo "Found build.sh, running it"
-            ./build.sh
-          elif [ -f "Makefile" ] && grep -q "^build:" Makefile; then
-            echo "Found Makefile with build target, running make build"
-            make build
-          else
-            echo "No build step found, skipping"
-          fi
 
       - name: Install kcat
         if: ${{ inputs.use_kafka }}
