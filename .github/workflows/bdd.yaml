@@ -124,7 +124,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: LukenLarra/insights-behavioral-spec
-          ref: modify-pythonpath-usage
+          ref: main
           path: insights-behavioral-spec
 
       - name: Setup Go
