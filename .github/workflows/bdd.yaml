@@ -289,3 +289,13 @@ jobs:
           feature_file: ${{ matrix.feature_file }}
           publish_results: ${{ inputs.parallel_execution == true && 'false' || 'true' }}
           artifact_name_suffix: ${{ inputs.parallel_execution == true && format('-job-{0}', strategy.job-index) || '' }}
+
+      - name: Dump aggregator logs on failure
+        if: failure()
+        run: |
+          echo "=== stdout ==="
+          find . -name "insights-results-aggregator.stdout" -exec cat {} \;
+          echo "=== stderr ==="
+          find . -name "insights-results-aggregator.stderr" -exec cat {} \;
+          echo "=== config file ==="
+          cat insights-behavioral-spec/config/insights_results_aggregator_docker_env.toml || echo "NOT FOUND"
