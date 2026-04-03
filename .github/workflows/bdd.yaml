@@ -267,6 +267,18 @@ jobs:
             echo "127.0.0.1 mock-oauth2-server" | sudo tee -a /etc/hosts
           fi
 
+
+      - name: Diagnose binary location
+        run: |
+          echo "=== GITHUB_WORKSPACE ==="
+          ls -lh $GITHUB_WORKSPACE/ | grep insights-results-aggregator || echo "NOT FOUND in workspace root"
+          echo "=== PATH ==="
+          echo $PATH
+          echo "=== which binary ==="
+          which insights-results-aggregator || echo "NOT in PATH"
+          echo "=== PATH_TO_LOCAL_AGGREGATOR ==="
+          ls -lh insights-behavioral-spec/insights-results-aggregator || echo "NOT FOUND"
+
       - name: Run BDD Framework
         uses: LukenLarra/RedHat-BDD-Framework@feature-level-parallel-execution
         with:
