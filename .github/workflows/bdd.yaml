@@ -109,6 +109,9 @@ jobs:
             if [ ! -e "$dir_name" ]; then
               ln -sf "${{ github.workspace }}/insights-behavioral-spec/$dir_name" "$dir_name"
               echo "Linked: $dir_name → insights-behavioral-spec/$dir_name"
+            elif [ -d "$dir_name" ]; then
+              echo "Directory $dir_name already exists, merging contents via copy..."
+              cp -r "insights-behavioral-spec/$dir_name/"* "$dir_name/" 2>/dev/null || true
             else
               echo "Skipped (already exists): $dir_name"
             fi
@@ -254,6 +257,9 @@ jobs:
             if [ ! -e "$dir_name" ]; then
               ln -sf "${{ github.workspace }}/insights-behavioral-spec/$dir_name" "$dir_name"
               echo "Linked: $dir_name → insights-behavioral-spec/$dir_name"
+            elif [ -d "$dir_name" ]; then
+              echo "Directory $dir_name already exists, merging contents via copy..."
+              cp -r "insights-behavioral-spec/$dir_name/"* "$dir_name/" 2>/dev/null || true
             else
               echo "Skipped (already exists): $dir_name"
             fi
