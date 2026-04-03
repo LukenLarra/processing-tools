@@ -236,8 +236,6 @@ jobs:
       - name: Copy framework config
         run: |
           cp insights-behavioral-spec/bdd-configs/${{ inputs.service }}-framework.yml framework.yml
-          # Excluir tests locales y gestionados manualmente que fallan en CI
-          sed -i 's/python -m behave/python -m behave --tags=~@local --tags=~@managed/' framework.yml
           if [ -n "${{ inputs.extra_framework_files }}" ]; then
             for item in ${{ inputs.extra_framework_files }}; do
               echo "Buscando $item..."
