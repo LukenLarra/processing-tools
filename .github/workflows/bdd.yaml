@@ -73,7 +73,11 @@ on:
         required: false
         type: number
         default: 256
-
+      extra_framework_files:
+        description: "Archivos o directorios adicionales a copiar desde insights-behavioral-spec hacia el workspace (separados por espacio)."
+        required: false
+        type: string
+        default: ""
 permissions:
   contents: read
   checks: write
@@ -228,7 +232,28 @@ jobs:
           sudo apt-get install -y kafkacat
 
       - name: Copy framework config
-        run: cp insights-behavioral-spec/bdd-configs/${{ inputs.service }}-framework.yml framework.yml
+        run: |
+          cp insights-behavioral-spec/bdd-configs/${{ inputs.service }}-framework.yml framework.yml
+          if [ -n "${{ inputs.extra_framework_files }}" ]; then
+            for item in ${{ inputs.extra_framework_files }}; do
+              echo "Buscando $item..."
+              # Buscar el item
+              found_items=$(cd insights-behavioral-spec && find . -name "$item" -not -path "*/\.git/*")
+              if [ -z "$found_items" ]; then
+                echo "Warning: No se encontró $item en insights-behavioral-spec."
+              else
+                for found in $found_items; do
+                  # Eliminar el prefijo './' que añade el comando find
+                  clean_path="${found#./}"
+                  # Crear la misma estructura de directorios en destino
+                  mkdir -p "$(dirname "./$clean_path")"
+                  # Copiar el archivo o directorio manteniendo su ruta original
+                  cp -r "insights-behavioral-spec/$clean_path" "./$clean_path"
+                  echo "Se ha copiado $clean_path exitosamente."
+                done
+              fi
+            done
+          fi
 
       - name: Add hosts entries
         if: ${{ inputs.use_pushgateway || inputs.use_mock-oauth2-server }}
