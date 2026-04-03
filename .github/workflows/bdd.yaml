@@ -73,11 +73,6 @@ on:
         required: false
         type: number
         default: 256
-      extra_framework_files:
-        description: "Archivos o directorios adicionales a copiar desde insights-behavioral-spec hacia el workspace (separados por espacio)."
-        required: false
-        type: string
-        default: ""
 permissions:
   contents: read
   checks: write
@@ -103,7 +98,21 @@ jobs:
           path: insights-behavioral-spec
 
       - name: Copy framework config
-        run: cp insights-behavioral-spec/bdd-configs/${{ inputs.service }}-framework.yml framework.yml
+        run: |
+          ln -sf "${{ github.workspace }}/insights-behavioral-spec/bdd-configs/${{ inputs.service }}-framework.yml" framework.yml
+          cd "${{ github.workspace }}"
+          for item in insights-behavioral-spec/*/; do
+            dir_name=$(basename "$item")
+            if [ "$dir_name" = "bdd-configs" ]; then
+              continue
+            fi
+            if [ ! -e "$dir_name" ]; then
+              ln -sf "${{ github.workspace }}/insights-behavioral-spec/$dir_name" "$dir_name"
+              echo "Linked: $dir_name → insights-behavioral-spec/$dir_name"
+            else
+              echo "Skipped (already exists): $dir_name"
+            fi
+          done
 
       - name: Run discovery
         id: discovery
@@ -235,27 +244,20 @@ jobs:
 
       - name: Copy framework config
         run: |
-          cp insights-behavioral-spec/bdd-configs/${{ inputs.service }}-framework.yml framework.yml
-          if [ -n "${{ inputs.extra_framework_files }}" ]; then
-            for item in ${{ inputs.extra_framework_files }}; do
-              echo "Buscando $item..."
-              # Buscar el item
-              found_items=$(cd insights-behavioral-spec && find . -name "$item" -not -path "*/\.git/*")
-              if [ -z "$found_items" ]; then
-                echo "Warning: No se encontró $item en insights-behavioral-spec."
-              else
-                for found in $found_items; do
-                  # Eliminar el prefijo './' que añade el comando find
-                  clean_path="${found#./}"
-                  # Crear la misma estructura de directorios en destino
-                  mkdir -p "$(dirname "./$clean_path")"
-                  # Copiar el archivo o directorio manteniendo su ruta original
-                  cp -r "insights-behavioral-spec/$clean_path" "./$clean_path"
-                  echo "Se ha copiado $clean_path exitosamente."
-                done
-              fi
-            done
-          fi
+          ln -sf "${{ github.workspace }}/insights-behavioral-spec/bdd-configs/${{ inputs.service }}-framework.yml" framework.yml
+          cd "${{ github.workspace }}"
+          for item in insights-behavioral-spec/*/; do
+            dir_name=$(basename "$item")
+            if [ "$dir_name" = "bdd-configs" ]; then
+              continue
+            fi
+            if [ ! -e "$dir_name" ]; then
+              ln -sf "${{ github.workspace }}/insights-behavioral-spec/$dir_name" "$dir_name"
+              echo "Linked: $dir_name → insights-behavioral-spec/$dir_name"
+            else
+              echo "Skipped (already exists): $dir_name"
+            fi
+          done
 
       - name: Add hosts entries
         if: ${{ inputs.use_pushgateway || inputs.use_mock-oauth2-server }}
@@ -266,7 +268,6 @@ jobs:
           if ${{ inputs.use_mock-oauth2-server }}; then
             echo "127.0.0.1 mock-oauth2-server" | sudo tee -a /etc/hosts
           fi
-
 
       - name: Diagnose binary location
         run: |
