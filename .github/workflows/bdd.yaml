@@ -2,77 +2,77 @@ name: BDD tests
 
 on:
   workflow_call:
-      inputs:
-        service:
-          description: Service to be tested
-          required: true
-          type: string
+    inputs:
+      service:
+        description: Service to be tested
+        required: true
+        type: string
 
-        use_kafka:
-          description: Whether to use Kafka
-          required: false
-          type: boolean
-          default: false
+      use_kafka:
+        description: Whether to use Kafka
+        required: false
+        type: boolean
+        default: false
 
-        use_postgres:
-          description: Whether to use PostgreSQL
-          required: false
-          type: boolean
-          default: false
+      use_postgres:
+        description: Whether to use PostgreSQL
+        required: false
+        type: boolean
+        default: false
 
-        postgres_version:
-          description: PostgreSQL version
-          required: false
-          type: string
-          default: "13.9"
+      postgres_version:
+        description: PostgreSQL version
+        required: false
+        type: string
+        default: "13.9"
 
-        use_minio:
-          description: Whether to use MinIO
-          required: false
-          type: boolean
-          default: false
+      use_minio:
+        description: Whether to use MinIO
+        required: false
+        type: boolean
+        default: false
 
-        use_pushgateway:
-          description: Whether to use Prometheus Pushgateway
-          required: false
-          type: boolean
-          default: false
+      use_pushgateway:
+        description: Whether to use Prometheus Pushgateway
+        required: false
+        type: boolean
+        default: false
 
-        use_mock-oauth2-server:
-          description: Whether to use Mock OAuth2 Server
-          required: false
-          type: boolean
-          default: false
+      use_mock-oauth2-server:
+        description: Whether to use Mock OAuth2 Server
+        required: false
+        type: boolean
+        default: false
 
-        go_version:
-          description: Version of Go to be used to build the service
-          required: false
-          type: string
-          default: "1.24"
+      go_version:
+        description: Version of Go to be used to build the service
+        required: false
+        type: string
+        default: "1.24"
 
-        install_service:
-          description: Whether to install the service as a Python package via pip install
-          required: false
-          type: boolean
-          default: false
+      install_service:
+        description: Whether to install the service as a Python package via pip install
+        required: false
+        type: boolean
+        default: false
 
-        bdd_config:
-          description: Path to the BDD framework config file
-          required: false
-          type: string
-          default: "insights-behavioral-spec/bdd-configs/framework.yml"
+      bdd_config:
+        description: Path to the BDD framework config file
+        required: false
+        type: string
+        default: "insights-behavioral-spec/bdd-configs/framework.yml"
 
-        parallel_execution:
-          description: "Ejecutar de forma paralela usando steps independientes por .feature"
-          required: false
-          type: boolean
-          default: false
+      parallel_execution:
+        description: "Ejecutar de forma paralela usando steps independientes por .feature"
+        required: false
+        type: boolean
+        default: false
 
-        max_parallel:
-          description: "Cantidad máxima de ejecuciones simultáneas (1 para secuencial)."
-          required: false
-          type: number
-          default: 256
+      max_parallel:
+        description: "Cantidad máxima de ejecuciones simultáneas (1 para secuencial)."
+        required: false
+        type: number
+        default: 256
 
 permissions:
   contents: read
@@ -110,6 +110,8 @@ jobs:
   # Compila el binario de Go y empaqueta el directorio resultante
   build_binary:
     runs-on: ubuntu-latest
+    outputs:
+      artifact_name: ${{ steps.set_artifact_name.outputs.name }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -134,10 +136,14 @@ jobs:
             echo "No build step found, skipping"
           fi
 
+      - name: Set artifact name
+        id: set_artifact_name
+        run: echo "name=workspace-build-${{ github.run_id }}-$(uuidgen)" >> $GITHUB_OUTPUT
+
       - name: Archive workspace build
         uses: actions/upload-artifact@v4
         with:
-          name: workspace-build-${{ github.run_id }}
+          name: ${{ steps.set_artifact_name.outputs.name }}
           path: |
             .
           include-hidden-files: true
@@ -202,7 +208,7 @@ jobs:
       - name: Download workspace build
         uses: actions/download-artifact@v4
         with:
-          name: workspace-build-${{ github.run_id }}
+          name: ${{ needs.build_binary.outputs.artifact_name }}
           path: .
 
       - name: Restore permissions
