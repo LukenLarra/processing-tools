@@ -215,8 +215,10 @@ jobs:
           name: ${{ needs.build_binary.outputs.artifact_name }}
           path: .
 
-      - name: Restore permissions
-        run: chmod -R +x * || true
+      - name: Restore permissions and path
+        run: |
+          chmod -R +x * || true
+          echo "$GITHUB_WORKSPACE" >> $GITHUB_PATH
 
       - name: Checkout insights-behavioral-spec
         uses: actions/checkout@v4
