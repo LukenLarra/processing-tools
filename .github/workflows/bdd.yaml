@@ -152,8 +152,24 @@ jobs:
           sudo apt-get update -q
           sudo apt-get install -y kafkacat
 
-      - name: Copy framework config
-        run: cp insights-behavioral-spec/bdd-configs/${{ inputs.service }}-framework.yml framework.yml
+      - name: Link framework config and resources
+        run: |
+          cd "${{ github.workspace }}"
+          ln -sf "${{ github.workspace }}/insights-behavioral-spec/bdd-configs/${{ inputs.service }}-framework.yml" framework.yml
+          for item in insights-behavioral-spec/*/; do
+            dir_name=$(basename "$item")
+            if [ "$dir_name" = "bdd-configs" ]; then
+              continue
+            fi
+            if [ -e "$dir_name" ]; then
+              echo "Skipped (already exists): $dir_name"
+            else
+              ln -sf "${{ github.workspace }}/insights-behavioral-spec/$dir_name" "$dir_name"
+              echo "Linked: $dir_name → insights-behavioral-spec/$dir_name"
+            fi
+          done
+          echo "=== Symlinks created ==="
+          ls -la | grep "^l"
 
       - name: Add hosts entries
         if: ${{ inputs.use_pushgateway || inputs.use_mock-oauth2-server }}
