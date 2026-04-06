@@ -306,3 +306,6 @@ jobs:
         uses: LukenLarra/RedHat-BDD-Framework/actions/publish-reports@feature-level-parallel-execution
         with:
           report_path: "reports/junit/*.xml"
+          service_package: ${{ inputs.install_service && github.workspace || '' }}
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
