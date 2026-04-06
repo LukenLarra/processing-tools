@@ -182,7 +182,7 @@ jobs:
           fi
 
       - name: Run BDD Framework
-        uses: LukenLarra/RedHat-BDD-Framework@modify-pythonpath-usage
+        uses: LukenLarra/RedHat-BDD-Framework@main
         with:
           service: ${{ inputs.service }}
           bdd_config: "${{ github.workspace }}/framework.yml"
