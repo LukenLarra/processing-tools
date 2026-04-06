@@ -237,7 +237,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: LukenLarra/insights-behavioral-spec
-          ref: main
+          ref: AI-feature-execution
           path: insights-behavioral-spec
 
       - name: Install kcat
@@ -276,7 +276,7 @@ jobs:
           fi
 
       - name: Run BDD Framework
-        uses: LukenLarra/RedHat-BDD-Framework@main
+        uses: LukenLarra/RedHat-BDD-Framework@AI-based-steps
         with:
           service: ${{ inputs.service }}
           bdd_config: "${{ github.workspace }}/framework.yml"
