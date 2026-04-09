@@ -85,6 +85,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.discovery.outputs.matrix }}
+      has_features: ${{ steps.discovery.outputs.has_features }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -166,13 +167,13 @@ jobs:
 
   # Usar strategy matrix con el output del anterior
   bdd:
-    if: ${{ always() && !cancelled() && !contains(needs.*.result, 'failure') }}
+    if: ${{ always() && !cancelled() && !contains(needs.*.result, 'failure') && (!inputs.parallel_execution || needs.discover_features.outputs.has_features == 'true') }}
     needs: [discover_features, build_binary]
     runs-on: ubuntu-latest
     name: BDD tests ${{ matrix.feature_file != '' && format('- {0}', matrix.feature_file) || '' }}
 
     strategy:
-      fail-fast: false # Si falla un test, los demás continuan
+      fail-fast: false
       max-parallel: ${{ inputs.parallel_execution == true && fromJSON(inputs.max_parallel || '256') || 1 }}
       matrix:
         feature_file: ${{ inputs.parallel_execution == true && fromJSON(needs.discover_features.outputs.matrix) || fromJSON('[""]') }}
@@ -282,14 +283,13 @@ jobs:
           test_requirements: "insights-behavioral-spec/requirements.txt"
           service_package: ${{ inputs.install_service == true && github.workspace || '' }}
           feature_file: ${{ matrix.feature_file }}
-          publish_results: ${{ inputs.parallel_execution == true && 'false' || 'true' }}
           artifact_name_suffix: ${{ inputs.parallel_execution == true && format('-job-{0}', strategy.job-index) || '' }}
-  
+
   publish_report:
     name: Publish Test Results
     needs: bdd
     runs-on: ubuntu-latest
-    if: ${{ always() && inputs.parallel_execution }}
+    if: ${{ always() }}
     permissions:
       contents: read
       checks: write
@@ -303,6 +303,6 @@ jobs:
           merge-multiple: true
 
       - name: Publish merged test results
-        uses: EnricoMi/publish-unit-test-result-action@v2
+        uses: LukenLarra/RedHat-BDD-Framework/publish-reports@feature-level-parallel-execution
         with:
-          files: reports/junit/*.xml
+          report_path: "reports/junit/*.xml"
