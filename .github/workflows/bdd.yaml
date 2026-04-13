@@ -281,6 +281,8 @@ jobs:
           service: ${{ inputs.service }}
           bdd_config: "${{ github.workspace }}/framework.yml"
           test_requirements: "insights-behavioral-spec/requirements.txt"
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           service_package: ${{ inputs.install_service == true && github.workspace || '' }}
           feature_file: ${{ matrix.feature_file }}
           artifact_name_suffix: ${{ inputs.parallel_execution == true && format('-job-{0}', strategy.job-index) || '' }}
