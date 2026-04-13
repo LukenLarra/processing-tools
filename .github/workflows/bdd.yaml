@@ -120,7 +120,7 @@ jobs:
 
       - name: Run discovery
         id: discovery
-        uses: LukenLarra/RedHat-BDD-Framework/actions/discovery@feature-level-parallel-execution
+        uses: LukenLarra/RedHat-BDD-Framework/actions/discovery@improve-test-reporting
         with:
           bdd_config: "${{ github.workspace }}/framework.yml"
 
@@ -276,7 +276,7 @@ jobs:
           fi
 
       - name: Run BDD Framework
-        uses: LukenLarra/RedHat-BDD-Framework/actions/main@feature-level-parallel-execution
+        uses: LukenLarra/RedHat-BDD-Framework/actions/main@improve-test-reporting
         with:
           service: ${{ inputs.service }}
           bdd_config: "${{ github.workspace }}/framework.yml"
@@ -303,6 +303,6 @@ jobs:
           merge-multiple: true
 
       - name: Publish merged test results
-        uses: LukenLarra/RedHat-BDD-Framework/actions/publish-reports@feature-level-parallel-execution
+        uses: LukenLarra/RedHat-BDD-Framework/actions/publish-reports@improve-test-reporting
         with:
           report_path: "reports/junit/*.xml"
