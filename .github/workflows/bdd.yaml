@@ -62,15 +62,121 @@ on:
         type: string
         default: "insights-behavioral-spec/bdd-configs/framework.yml"
 
+      parallel_execution:
+        description: "Ejecutar de forma paralela usando steps independientes por .feature"
+        required: false
+        type: boolean
+        default: false
+
+      max_parallel:
+        description: "Cantidad máxima de ejecuciones simultáneas (1 para secuencial)."
+        required: false
+        type: number
+        default: 256
 permissions:
   contents: read
   checks: write
   pull-requests: write
 
 jobs:
-  bdd:
+  # Descubre las features y crea la matriz JSON
+  discover_features:
+    if: ${{ inputs.parallel_execution }}
     runs-on: ubuntu-latest
-    name: BDD tests
+    outputs:
+      matrix: ${{ steps.discovery.outputs.matrix }}
+      has_features: ${{ steps.discovery.outputs.has_features }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout insights-behavioral-spec
+        uses: actions/checkout@v4
+        with:
+          repository: LukenLarra/insights-behavioral-spec
+          ref: aggregator-framework-config
+          path: insights-behavioral-spec
+
+      - name: Link framework config and resources
+        run: |
+          ln -sf "${{ github.workspace }}/insights-behavioral-spec/bdd-configs/${{ inputs.service }}-framework.yml" framework.yml
+          cd "${{ github.workspace }}"
+          for item in insights-behavioral-spec/*/; do
+            dir_name=$(basename "$item")
+            if [ "$dir_name" = "bdd-configs" ]; then
+              continue
+            fi
+            if [ ! -e "$dir_name" ]; then
+              ln -sf "${{ github.workspace }}/insights-behavioral-spec/$dir_name" "$dir_name"
+              echo "Linked: $dir_name → insights-behavioral-spec/$dir_name"
+            elif [ -d "$dir_name" ]; then
+              echo "Directory $dir_name already exists, merging contents via copy..."
+              cp -r "insights-behavioral-spec/$dir_name/"* "$dir_name/" 2>/dev/null || true
+            else
+              echo "Skipped (already exists): $dir_name"
+            fi
+          done
+
+      - name: Run discovery
+        id: discovery
+        uses: LukenLarra/RedHat-BDD-Framework/actions/discovery@feature-level-parallel-execution
+        with:
+          bdd_config: "${{ github.workspace }}/framework.yml"
+
+  # Compila el binario de Go y empaqueta el directorio resultante
+  build_binary:
+    runs-on: ubuntu-latest
+    outputs:
+      artifact_name: ${{ steps.set_artifact_name.outputs.name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        if: ${{ !inputs.install_service }}
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ inputs.go_version }}
+
+      - name: Build service binary
+        if: ${{ !inputs.install_service }}
+        run: |
+          if [ -f "build.sh" ]; then
+            echo "Found build.sh, running it"
+            ./build.sh
+          elif [ -f "Makefile" ] && grep -q "^build:" Makefile; then
+            echo "Found Makefile with build target, running make build"
+            make build
+          else
+            echo "No build step found, skipping"
+          fi
+
+      - name: Set artifact name
+        id: set_artifact_name
+        run: echo "name=workspace-build-${{ github.run_id }}-$(uuidgen)" >> $GITHUB_OUTPUT
+
+      - name: Archive workspace build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.set_artifact_name.outputs.name }}
+          path: |
+            .
+          include-hidden-files: true
+
+  # Usar strategy matrix con el output del anterior
+  bdd:
+    if: ${{ always() && !cancelled() && !contains(needs.*.result, 'failure') && (!inputs.parallel_execution || needs.discover_features.outputs.has_features == 'true') }}
+    needs: [discover_features, build_binary]
+    runs-on: ubuntu-latest
+    name: BDD tests ${{ matrix.feature_file != '' && format('- {0}', matrix.feature_file) || '' }}
+
+    strategy:
+      fail-fast: false
+      max-parallel: ${{ inputs.parallel_execution == true && fromJSON(inputs.max_parallel || '256') || 1 }}
+      matrix:
+        feature_file: ${{ inputs.parallel_execution == true && fromJSON(needs.discover_features.outputs.matrix) || fromJSON('[""]') }}
 
     services:
       kafka:
@@ -116,9 +222,16 @@ jobs:
           PORT: 8081
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Download workspace build
+        uses: actions/download-artifact@v4
         with:
-          fetch-depth: 0
+          name: ${{ needs.build_binary.outputs.artifact_name }}
+          path: .
+
+      - name: Restore permissions and path
+        run: |
+          chmod -R +x * || true
+          echo "$GITHUB_WORKSPACE" >> $GITHUB_PATH
 
       - name: Checkout insights-behavioral-spec
         uses: actions/checkout@v4
@@ -126,25 +239,6 @@ jobs:
           repository: LukenLarra/insights-behavioral-spec
           ref: AI-feature-execution
           path: insights-behavioral-spec
-
-      - name: Setup Go
-        if: ${{ !inputs.install_service }}
-        uses: actions/setup-go@v4
-        with:
-          go-version: ${{ inputs.go_version }}
-
-      - name: Build service binary
-        if: ${{ !inputs.install_service }}
-        run: |
-          if [ -f "build.sh" ]; then
-            echo "Found build.sh, running it"
-            ./build.sh
-          elif [ -f "Makefile" ] && grep -q "^build:" Makefile; then
-            echo "Found Makefile with build target, running make build"
-            make build
-          else
-            echo "No build step found, skipping"
-          fi
 
       - name: Install kcat
         if: ${{ inputs.use_kafka }}
@@ -187,6 +281,30 @@ jobs:
           service: ${{ inputs.service }}
           bdd_config: "${{ github.workspace }}/framework.yml"
           test_requirements: "insights-behavioral-spec/requirements.txt"
-          service_package: ${{ inputs.install_service && github.workspace || '' }}
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          service_package: ${{ inputs.install_service == true && github.workspace || '' }}
+          feature_file: ${{ matrix.feature_file }}
+          artifact_name_suffix: ${{ inputs.parallel_execution == true && format('-job-{0}', strategy.job-index) || '' }}
+
+  publish_report:
+    name: Publish Test Results
+    needs: bdd
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+    steps:
+      - name: Download partial reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: bdd-test-reports-${{ inputs.service }}-*
+          path: reports/junit
+          merge-multiple: true
+
+      - name: Publish merged test results
+        uses: LukenLarra/RedHat-BDD-Framework/actions/publish-reports@feature-level-parallel-execution
+        with:
+          report_path: "reports/junit/*.xml"
