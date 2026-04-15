@@ -276,7 +276,7 @@ jobs:
           fi
 
       - name: Run BDD Framework
-        uses: LukenLarra/RedHat-BDD-Framework@main
+        uses: LukenLarra/RedHat-BDD-Framework/actions/main@main
         with:
           service: ${{ inputs.service }}
           bdd_config: "${{ github.workspace }}/framework.yml"
