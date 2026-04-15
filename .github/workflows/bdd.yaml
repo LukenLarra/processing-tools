@@ -120,7 +120,7 @@ jobs:
 
       - name: Run discovery
         id: discovery
-        uses: LukenLarra/RedHat-BDD-Framework/actions/discovery@feature-level-parallel-execution
+        uses: LukenLarra/RedHat-BDD-Framework/actions/discovery@main
         with:
           bdd_config: "${{ github.workspace }}/framework.yml"
 
