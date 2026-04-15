@@ -303,6 +303,6 @@ jobs:
           merge-multiple: true
 
       - name: Publish merged test results
-        uses: LukenLarra/RedHat-BDD-Framework/actions/publish-reports@feature-level-parallel-execution
+        uses: LukenLarra/RedHat-BDD-Framework/actions/publish-reports@main
         with:
           report_path: "reports/junit/*.xml"
