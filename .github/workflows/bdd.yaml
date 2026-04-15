@@ -95,7 +95,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: LukenLarra/insights-behavioral-spec
-          ref: main
+          ref: run-tests-on-prs
           path: insights-behavioral-spec
 
       - name: Link framework config and resources
@@ -237,7 +237,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: LukenLarra/insights-behavioral-spec
-          ref: main
+          ref: run-tests-on-prs
           path: insights-behavioral-spec
 
       - name: Install kcat
