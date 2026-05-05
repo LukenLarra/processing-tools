@@ -101,6 +101,7 @@ jobs:
       - name: Link framework config and resources
         run: |
           ln -sf "${{ github.workspace }}/insights-behavioral-spec/bdd-configs/${{ inputs.service }}-framework.yml" framework.yml
+          ln -sf "${{ github.workspace }}/insights-behavioral-spec/features/${{ inputs.service }}" features
           cd "${{ github.workspace }}"
           for item in insights-behavioral-spec/*/; do
             dir_name=$(basename "$item")
@@ -250,6 +251,7 @@ jobs:
         run: |
           cd "${{ github.workspace }}"
           ln -sf "${{ github.workspace }}/insights-behavioral-spec/bdd-configs/${{ inputs.service }}-framework.yml" framework.yml
+          ln -sf "${{ github.workspace }}/insights-behavioral-spec/features/${{ inputs.service }}" features
           for item in insights-behavioral-spec/*/; do
             dir_name=$(basename "$item")
             if [ "$dir_name" = "bdd-configs" ] || [ "$dir_name" = "features" ]; then
