@@ -104,7 +104,7 @@ jobs:
           cd "${{ github.workspace }}"
           for item in insights-behavioral-spec/*/; do
             dir_name=$(basename "$item")
-            if [ "$dir_name" = "bdd-configs" ]; then
+            if [ "$dir_name" = "bdd-configs" ] || [ "$dir_name" = "features" ]; then
               continue
             fi
             if [ ! -e "$dir_name" ]; then
@@ -252,7 +252,7 @@ jobs:
           ln -sf "${{ github.workspace }}/insights-behavioral-spec/bdd-configs/${{ inputs.service }}-framework.yml" framework.yml
           for item in insights-behavioral-spec/*/; do
             dir_name=$(basename "$item")
-            if [ "$dir_name" = "bdd-configs" ]; then
+            if [ "$dir_name" = "bdd-configs" ] || [ "$dir_name" = "features" ]; then
               continue
             fi
             if [ -e "$dir_name" ]; then
